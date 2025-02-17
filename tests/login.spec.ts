@@ -8,4 +8,5 @@ test('login test', async ({ page }) => {
 
   // Asercja sprawdzająca URL lub 
   await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
+  await page.close();
 });
