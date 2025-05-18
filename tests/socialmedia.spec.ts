@@ -56,6 +56,8 @@ test.describe('Sprawdzanie przekierowań do mediów społecznościowych', () => 
     ]);
     await newPage.waitForLoadState('domcontentloaded');
     expect(newPage.url()).toBe('https://www.linkedin.com/company/sauce-labs/');
+    await newPage.close();
+await page.close()
   });
 
 });

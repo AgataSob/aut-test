@@ -8,7 +8,7 @@ class LoginPage {
   }
 
   async navigate() {
-    await this.page.goto('https://www.saucedemo.com/');
+    await this.page.goto('/');
   }
 
   async login(username: string, password: string) {
@@ -19,34 +19,26 @@ class LoginPage {
   }
 }
 
-test.describe('Sprawdzanie przekierowań do mediów społecznościowych', () => {
-  let loginPage: LoginPage;
 
-  test.beforeEach(async ({ page }) => {
-    loginPage = new LoginPage(page);
-    await loginPage.navigate();
-    await loginPage.login('standard_user', 'secret_sauce'); // Wprowadzenie logowania
-  });
+import ProductPage from '../pages/ProductPage';
+import CheckoutPage from '../pages/CheckoutPage';
 
-  test('Przekierowanie do Twittera działa poprawnie', async ({ page }) => {
-    const twitterLink = await page.locator('a[href="https://twitter.com/saucelabs"]');
-    await twitterLink.click();
-    await page.waitForLoadState('domcontentloaded');
-    expect(page.url()).toBe('https://twitter.com/saucelabs'); // Poprawny oczekiwany wynik
-  });
+test('login test', async ({ page }) => {
+  const loginPage = new LoginPage(page);
+  const productPage = new ProductPage(page);
+  const checkoutPage = new CheckoutPage(page);
 
-  test('Przekierowanie do Facebooka działa poprawnie', async ({ page }) => {
-    const facebookLink = await page.locator('a[href="https://www.facebook.com/saucelabs"]');
-    await facebookLink.click();
-    await page.waitForLoadState('domcontentloaded');
-    expect(page.url()).toBe('https://www.facebook.com/saucelabs'); // Poprawny oczekiwany wynik
-  });
+  await loginPage.navigate();
+  await loginPage.login('standard_user', 'secret_sauce');
 
-  test('Przekierowanie do LinkedIna działa poprawnie', async ({ page }) => {
-    const linkedinLink = await page.locator('a[href="https://www.linkedin.com/company/sauce-labs/"]');
-    await linkedinLink.click();
-    await page.waitForLoadState('domcontentloaded');
-    expect(page.url()).toBe('https://www.linkedin.com/company/sauce-labs/'); // Poprawny oczekiwany wynik
-  });
+  await productPage.addToCart();
+  await productPage.goToCart();
+  await productPage.checkout();
 
+  await checkoutPage.fillCheckoutDetails('Agata', 'XXX', '45-404');
+  await checkoutPage.continueCheckout();
+  await checkoutPage.finishCheckout();
+
+  await expect(page).toHaveURL('https://www.saucedemo.com/checkout-complete.html');
+  await page.close();
 });
